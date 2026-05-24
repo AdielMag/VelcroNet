@@ -1,4 +1,4 @@
-using Genbox.VelcroPhysics.Dynamics;
+using nkast.Aether.Physics2D.Dynamics;
 using SNV2 = System.Numerics.Vector2;
 
 namespace VelcroNet;

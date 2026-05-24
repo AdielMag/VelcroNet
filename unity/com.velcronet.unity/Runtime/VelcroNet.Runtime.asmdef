@@ -8,7 +8,7 @@
     "overrideReferences": false,
     "precompiledReferences": [
         "VelcroNet.Shared.dll",
-        "Genbox.VelcroPhysics.dll"
+        "Aether.Physics2D.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

@@ -1,6 +1,4 @@
-using Genbox.VelcroPhysics.Collision.Filtering;
-using Genbox.VelcroPhysics.Dynamics;
-using Genbox.VelcroPhysics.Factories;
+using nkast.Aether.Physics2D.Dynamics;
 using UnityEngine;
 using VelcroNet.Collision;
 
@@ -22,10 +20,10 @@ namespace VelcroNet
             float friction    = _material != null ? _material.Friction    : 0.2f;
             float restitution = _material != null ? _material.Restitution : 0f;
 
-            float simRadius   = _radius / SimulationConstants.PixelsPerMeter;
-            var   simOffset   = MathBridge.ToNumerics(_offset) / SimulationConstants.PixelsPerMeter;
+            float simRadius = _radius / SimulationConstants.PixelsPerMeter;
+            var   simOffset = MathBridge.ToNumerics(_offset) / SimulationConstants.PixelsPerMeter;
 
-            Fixture fixture = FixtureFactory.AttachCircle(body, simRadius, density, simOffset);
+            Fixture fixture = body.CreateCircle(simRadius, density, AetherInterop.ToAether(simOffset));
 
             fixture.Friction    = friction;
             fixture.Restitution = restitution;

@@ -1,16 +1,16 @@
 using System;
-using Genbox.VelcroPhysics.Collision.ContactSystem;
-using Genbox.VelcroPhysics.Dynamics;
-using Genbox.VelcroPhysics.Factories;
+using nkast.Aether.Physics2D.Dynamics;
+using nkast.Aether.Physics2D.Dynamics.Contacts;
 using VelcroNet.Collision;
 using VelcroNet.Network;
 using VelcroNet.Queries;
-using SNV2 = System.Numerics.Vector2;
+using AVec2 = nkast.Aether.Physics2D.Common.Vector2;
+using SNV2  = System.Numerics.Vector2;
 
 namespace VelcroNet;
 
 /// <summary>
-/// Owns the VelcroPhysics World, the fixed-timestep accumulator, the body registry,
+/// Owns the Aether.Physics2D World, the fixed-timestep accumulator, the body registry,
 /// and the collision event queues. This class is the same on server and Unity client.
 /// </summary>
 public sealed class PhysicsWorldManager
@@ -20,7 +20,7 @@ public sealed class PhysicsWorldManager
 
     // --- Body registry (parallel arrays, indexed by entityId) ---
     private readonly Body[]                 _bodyRegistry;
-    private readonly EntityToken[]          _entityTokens;  // Body.UserData without boxing
+    private readonly EntityToken[]          _entityTokens;  // Body.Tag without boxing
     private readonly EntityState[]          _stateBuffer;   // for CopyStateTo / snapshot
     private readonly RigidbodyConstraints[] _constraints;
     private readonly SNV2[]                 _frozenPositions;
@@ -41,12 +41,12 @@ public sealed class PhysicsWorldManager
     private readonly ContactTracker      _contactTracker;
 
     // Pre-allocated delegates — subscribed to fixtures at CreateBody time, never reallocated.
-    private readonly Func<Fixture, Fixture, Contact, bool> _onCollisionHandler;
-    private readonly Action<Fixture, Fixture, Contact>     _onSeparationHandler;
+    private readonly OnCollisionEventHandler  _onCollisionHandler;
+    private readonly OnSeparationEventHandler _onSeparationHandler;
 
     // --- Query system ---
     private readonly PhysicsQueryBuffer _queryBuffer;
-    private readonly Func<Fixture, SNV2, SNV2, float, float> _rayCastCallback;
+    private readonly Func<Fixture, AVec2, AVec2, float, float> _rayCastCallback;
     private PhysicsQueryBuffer? _activeQueryBuffer; // set during Raycast call
 
     // --- Optional network provider ---
@@ -62,8 +62,7 @@ public sealed class PhysicsWorldManager
     {
         _maxBodies = config.MaxBodies > 0 ? config.MaxBodies : SimulationConstants.MaxBodies;
 
-        _world = new World(config.Gravity);
-        _world.Enabled = true;
+        _world = new World(AetherInterop.ToAether(config.Gravity));
 
         _bodyRegistry    = new Body[_maxBodies];
         _entityTokens    = new EntityToken[_maxBodies];
@@ -111,10 +110,7 @@ public sealed class PhysicsWorldManager
         _accumulator += deltaTime;
         while (_accumulator >= SimulationConstants.FixedTimestep)
         {
-            _world.Step(
-                SimulationConstants.FixedTimestep,
-                SimulationConstants.VelocityIterations,
-                SimulationConstants.PositionIterations);
+            _world.Step(SimulationConstants.FixedTimestep);
 
             ApplyFreezeConstraints();
             _tickNumber++;
@@ -141,17 +137,19 @@ public sealed class PhysicsWorldManager
         if (_bodyRegistry[entityId] != null)
             throw new InvalidOperationException($"Entity {entityId} is already registered.");
 
-        Body body = _world.CreateBody(def.Position, def.Angle, def.BodyType);
+        Body body = _world.CreateBody(
+            AetherInterop.ToAether(def.Position),
+            def.Angle,
+            def.BodyType);
+
         body.LinearDamping  = def.LinearDamping;
         body.AngularDamping = def.AngularDamping;
-        body.GravityScale   = def.GravityScale;
         body.FixedRotation  = def.FixedRotation
                               || (def.Constraints & RigidbodyConstraints.FreezeRotation) != 0;
-        body.IsBullet = def.IsBullet;
 
         var token = new EntityToken { EntityId = entityId };
-        _entityTokens[entityId]  = token;
-        body.UserData            = token;
+        _entityTokens[entityId] = token;
+        body.Tag                = token;
 
         _bodyRegistry[entityId]    = body;
         _constraints[entityId]     = def.Constraints;
@@ -188,7 +186,7 @@ public sealed class PhysicsWorldManager
 
     /// <summary>
     /// Attach a fixture to a body and subscribe the pre-allocated collision delegates.
-    /// Call after CreateBody; typically called by the collider components via IVelcroColliderProvider.
+    /// Call after CreateBody; typically called by the collider components.
     /// </summary>
     public void SubscribeFixtureEvents(Fixture fixture)
     {
@@ -215,12 +213,12 @@ public sealed class PhysicsWorldManager
             destination[count++] = new EntityState
             {
                 EntityId  = id,
-                IsAwake   = body.IsAwake,
+                IsAwake   = body.Awake,
                 Transform = new TransformState
                 {
-                    Position        = body.Position,
+                    Position        = AetherInterop.FromAether(body.Position),
                     Angle           = body.Rotation,
-                    LinearVelocity  = body.LinearVelocity,
+                    LinearVelocity  = AetherInterop.FromAether(body.LinearVelocity),
                     AngularVelocity = body.AngularVelocity,
                 },
             };
@@ -233,9 +231,9 @@ public sealed class PhysicsWorldManager
         if (body == null) return default;
         return new TransformState
         {
-            Position        = body.Position,
+            Position        = AetherInterop.FromAether(body.Position),
             Angle           = body.Rotation,
-            LinearVelocity  = body.LinearVelocity,
+            LinearVelocity  = AetherInterop.FromAether(body.LinearVelocity),
             AngularVelocity = body.AngularVelocity,
         };
     }
@@ -248,27 +246,30 @@ public sealed class PhysicsWorldManager
     {
         Body? body = GetDynamicBodyOrNull(entityId);
         if (body == null) return;
+        AVec2 f = AetherInterop.ToAether(force);
         switch (mode)
         {
             case ForceMode.Force:
-                body.ApplyForce(force);
+                body.ApplyForce(f);
                 break;
             case ForceMode.Impulse:
-                body.ApplyLinearImpulse(force);
+                body.ApplyLinearImpulse(f);
                 break;
             case ForceMode.VelocityChange:
-                // mass-independent: supply the impulse that would produce deltaV regardless of mass
-                body.ApplyLinearImpulse(force * body.Mass);
+                // mass-independent: supply the impulse that produces deltaV regardless of mass
+                body.ApplyLinearImpulse(new AVec2(f.X * body.Mass, f.Y * body.Mass));
                 break;
             case ForceMode.Acceleration:
                 // mass-independent continuous force
-                body.ApplyForce(force * body.Mass);
+                body.ApplyForce(new AVec2(f.X * body.Mass, f.Y * body.Mass));
                 break;
         }
     }
 
     public void ApplyForceAtPoint(int entityId, in SNV2 force, in SNV2 worldPoint)
-        => GetDynamicBodyOrNull(entityId)?.ApplyForce(force, worldPoint);
+        => GetDynamicBodyOrNull(entityId)?.ApplyForce(
+            AetherInterop.ToAether(force),
+            AetherInterop.ToAether(worldPoint));
 
     public void ApplyTorque(int entityId, float torque)
         => GetDynamicBodyOrNull(entityId)?.ApplyTorque(torque);
@@ -280,14 +281,14 @@ public sealed class PhysicsWorldManager
     // State getters / setters
     // ─────────────────────────────────────────────────────────────────────────
 
-    public SNV2  GetLinearVelocity(int entityId)  => GetBodyOrNull(entityId)?.LinearVelocity ?? default;
+    public SNV2  GetLinearVelocity(int entityId)  => AetherInterop.FromAether(GetBodyOrNull(entityId)?.LinearVelocity ?? default);
     public float GetAngularVelocity(int entityId) => GetBodyOrNull(entityId)?.AngularVelocity ?? 0f;
     public float GetMass(int entityId)            => GetBodyOrNull(entityId)?.Mass ?? 0f;
 
     public void SetLinearVelocity(int entityId, in SNV2 vel)
     {
         Body? b = GetBodyOrNull(entityId);
-        if (b != null) b.LinearVelocity = vel;
+        if (b != null) b.LinearVelocity = AetherInterop.ToAether(vel);
     }
 
     public void SetAngularVelocity(int entityId, float angVel)
@@ -299,26 +300,20 @@ public sealed class PhysicsWorldManager
     public void SetPosition(int entityId, in SNV2 pos)
     {
         Body? b = GetBodyOrNull(entityId);
-        if (b != null) b.Position = pos;
+        if (b != null) b.Position = AetherInterop.ToAether(pos);
     }
 
-    public bool IsSleeping(int entityId) => !(GetBodyOrNull(entityId)?.IsAwake ?? false);
+    public bool IsSleeping(int entityId) => !(GetBodyOrNull(entityId)?.Awake ?? false);
 
     public void SetSleepState(int entityId, bool sleep)
     {
         Body? b = GetBodyOrNull(entityId);
         if (b == null) return;
-        b.IsAwake = !sleep;
+        b.Awake = !sleep;
     }
 
     public void ResetDynamics(int entityId)
         => GetBodyOrNull(entityId)?.ResetDynamics();
-
-    public void SetGravityScale(int entityId, float scale)
-    {
-        Body? b = GetBodyOrNull(entityId);
-        if (b != null) b.GravityScale = scale;
-    }
 
     // ─────────────────────────────────────────────────────────────────────────
     // Physics queries
@@ -337,8 +332,8 @@ public sealed class PhysicsWorldManager
     {
         buffer.ClearRaycast();
         _activeQueryBuffer = buffer;
-        SNV2 end = origin + direction * distance;
-        _world.RayCast(_rayCastCallback, origin, end);
+        SNV2  end     = origin + direction * distance;
+        _world.RayCast(_rayCastCallback, AetherInterop.ToAether(origin), AetherInterop.ToAether(end));
         _activeQueryBuffer = null;
     }
 
@@ -355,8 +350,8 @@ public sealed class PhysicsWorldManager
 
     private bool HandleCollision(Fixture sender, Fixture other, Contact contact)
     {
-        if (sender.Body.UserData is not EntityToken tokenA) return true;
-        if (other.Body.UserData  is not EntityToken tokenB) return true;
+        if (sender.Body.Tag is not EntityToken tokenA) return true;
+        if (other.Body.Tag  is not EntityToken tokenB) return true;
 
         int idA = tokenA.EntityId;
         int idB = tokenB.EntityId;
@@ -377,15 +372,14 @@ public sealed class PhysicsWorldManager
         {
             if (_contactTracker.TryAddNew(idA, idB, _tickNumber, out bool isNew) && isNew)
             {
-                SNV2 contactPoint = default;
+                SNV2 contactPoint  = default;
                 SNV2 contactNormal = default;
 
-                // GetWorldManifold only valid when the manifold has points
                 if (contact.Manifold.PointCount > 0)
                 {
-                    contact.GetWorldManifold(out contactNormal, out var points);
-                    // FixedArray2<T> — first contact point is at index 0
-                    contactPoint = points[0];
+                    contact.GetWorldManifold(out AVec2 normal, out var points);
+                    contactNormal = AetherInterop.FromAether(normal);
+                    contactPoint  = AetherInterop.FromAether(points[0]);
                 }
 
                 _events.EnqueueEnter(new CollisionData
@@ -403,8 +397,8 @@ public sealed class PhysicsWorldManager
 
     private void HandleSeparation(Fixture sender, Fixture other, Contact contact)
     {
-        if (sender.Body.UserData is not EntityToken tokenA) return;
-        if (other.Body.UserData  is not EntityToken tokenB) return;
+        if (sender.Body.Tag is not EntityToken tokenA) return;
+        if (other.Body.Tag  is not EntityToken tokenB) return;
 
         int idA = tokenA.EntityId;
         int idB = tokenB.EntityId;
@@ -435,20 +429,20 @@ public sealed class PhysicsWorldManager
         }
     }
 
-    private float RayCastCallback(Fixture fixture, SNV2 point, SNV2 normal, float fraction)
+    private float RayCastCallback(Fixture fixture, AVec2 point, AVec2 normal, float fraction)
     {
         if (_activeQueryBuffer == null) return -1f;
         if (_activeQueryBuffer.RaycastCount >= _activeQueryBuffer.RaycastResults.Length)
             return 0f; // buffer full — stop ray
 
-        int entityId = (fixture.Body.UserData as EntityToken)?.EntityId ?? -1;
+        int entityId = (fixture.Body.Tag as EntityToken)?.EntityId ?? -1;
 
         _activeQueryBuffer.RaycastResults[_activeQueryBuffer.RaycastCount++] = new RaycastHit
         {
             EntityId     = entityId,
-            FixtureIndex = 0, // future: look up fixture index
-            Point        = point,
-            Normal       = normal,
+            FixtureIndex = 0,
+            Point        = AetherInterop.FromAether(point),
+            Normal       = AetherInterop.FromAether(normal),
             Fraction     = fraction,
             IsTrigger    = fixture.IsSensor,
         };
@@ -464,13 +458,13 @@ public sealed class PhysicsWorldManager
     {
         for (int i = 0; i < _frozenCount; i++)
         {
-            int   id  = _frozenIds[i];
+            int   id   = _frozenIds[i];
             Body? body = _bodyRegistry[id];
             if (body == null) continue;
 
             RigidbodyConstraints c   = _constraints[id];
-            SNV2                 pos = body.Position;
-            SNV2                 vel = body.LinearVelocity;
+            SNV2                 pos = AetherInterop.FromAether(body.Position);
+            SNV2                 vel = AetherInterop.FromAether(body.LinearVelocity);
 
             if ((c & RigidbodyConstraints.FreezePositionX) != 0)
             {
@@ -483,8 +477,8 @@ public sealed class PhysicsWorldManager
                 vel.Y = 0f;
             }
 
-            body.Position       = pos;
-            body.LinearVelocity = vel;
+            body.Position       = AetherInterop.ToAether(pos);
+            body.LinearVelocity = AetherInterop.ToAether(vel);
         }
     }
 

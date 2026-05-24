@@ -32,8 +32,8 @@ jobs:
       - name: Copy DLLs into Plugins
         run: |
           mkdir -p unity/com.velcronet.unity/Runtime/Plugins
-          cp build-output/VelcroNet.Shared.dll        unity/com.velcronet.unity/Runtime/Plugins/
-          cp build-output/Genbox.VelcroPhysics.dll    unity/com.velcronet.unity/Runtime/Plugins/
+          cp build-output/VelcroNet.Shared.dll       unity/com.velcronet.unity/Runtime/Plugins/
+          cp build-output/Aether.Physics2D.dll       unity/com.velcronet.unity/Runtime/Plugins/
 
       - name: Configure git
         run: |
@@ -46,7 +46,7 @@ jobs:
         run: |
           # Force-include the Plugins DLLs (they're gitignored on main)
           git add -f unity/com.velcronet.unity/Runtime/Plugins/VelcroNet.Shared.dll
-          git add -f unity/com.velcronet.unity/Runtime/Plugins/Genbox.VelcroPhysics.dll
+          git add -f unity/com.velcronet.unity/Runtime/Plugins/Aether.Physics2D.dll
 
           git commit -m "Build UPM package for $TAG"
 

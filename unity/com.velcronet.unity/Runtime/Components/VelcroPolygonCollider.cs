@@ -1,10 +1,7 @@
-using Genbox.VelcroPhysics.Collision.Filtering;
-using Genbox.VelcroPhysics.Dynamics;
-using Genbox.VelcroPhysics.Factories;
-using Genbox.VelcroPhysics.Shared;
+using nkast.Aether.Physics2D.Common;
+using nkast.Aether.Physics2D.Dynamics;
 using UnityEngine;
 using VelcroNet.Collision;
-using SNV2 = System.Numerics.Vector2;
 
 namespace VelcroNet
 {
@@ -24,7 +21,10 @@ namespace VelcroNet
         {
             _simVertices = new Vertices(_vertices.Length);
             for (int i = 0; i < _vertices.Length; i++)
-                _simVertices.Add(MathBridge.ToNumerics(_vertices[i]) / SimulationConstants.PixelsPerMeter);
+            {
+                var v = MathBridge.ToNumerics(_vertices[i]) / SimulationConstants.PixelsPerMeter;
+                _simVertices.Add(AetherInterop.ToAether(v));
+            }
         }
 
         void IVelcroColliderProvider.AttachToBody(Body body, PhysicsWorldManager world)
@@ -39,7 +39,7 @@ namespace VelcroNet
             float friction    = _material != null ? _material.Friction    : 0.2f;
             float restitution = _material != null ? _material.Restitution : 0f;
 
-            Fixture fixture = FixtureFactory.AttachPolygon(body, _simVertices, density);
+            Fixture fixture = body.CreatePolygon(_simVertices, density);
 
             fixture.Friction    = friction;
             fixture.Restitution = restitution;

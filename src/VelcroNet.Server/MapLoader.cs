@@ -1,13 +1,12 @@
 using System;
 using System.IO;
 using System.Text.Json;
-using Genbox.VelcroPhysics.Collision.Filtering;
-using Genbox.VelcroPhysics.Dynamics;
-using Genbox.VelcroPhysics.Factories;
-using Genbox.VelcroPhysics.Shared;
+using nkast.Aether.Physics2D.Common;
+using nkast.Aether.Physics2D.Dynamics;
 using VelcroNet;
 using VelcroNet.Collision;
-using SNV2 = System.Numerics.Vector2;
+using AVec2 = nkast.Aether.Physics2D.Common.Vector2;
+using SNV2  = System.Numerics.Vector2;
 
 namespace VelcroNet.Server;
 
@@ -58,12 +57,12 @@ public sealed class MapLoader
 
     private void AttachFixture(PhysicsWorldManager world, Body body, BakedFixtureDef data)
     {
-        var offset = new SNV2(data.OffsetX, data.OffsetY);
+        AVec2 offset = new AVec2(data.OffsetX, data.OffsetY);
 
         Fixture fixture = data.Shape switch
         {
-            BakedFixtureShape.Box     => FixtureFactory.AttachRectangle(body, data.Width, data.Height, data.Density, offset),
-            BakedFixtureShape.Circle  => FixtureFactory.AttachCircle(body, data.Radius, data.Density, offset),
+            BakedFixtureShape.Box     => body.CreateRectangle(data.Width, data.Height, data.Density, offset),
+            BakedFixtureShape.Circle  => body.CreateCircle(data.Radius, data.Density, offset),
             BakedFixtureShape.Polygon => AttachPolygon(body, data),
             _ => throw new ArgumentOutOfRangeException(nameof(data.Shape))
         };
@@ -81,9 +80,9 @@ public sealed class MapLoader
         _scratchVertices.Clear();
         int count = Math.Min(data.VerticesX.Length, data.VerticesY.Length);
         for (int i = 0; i < count; i++)
-            _scratchVertices.Add(new SNV2(data.VerticesX[i], data.VerticesY[i]));
+            _scratchVertices.Add(new AVec2(data.VerticesX[i], data.VerticesY[i]));
 
-        return FixtureFactory.AttachPolygon(body, _scratchVertices, data.Density);
+        return body.CreatePolygon(_scratchVertices, data.Density);
     }
 
     private static void ApplyFilter(Fixture fixture, int layer, int mask)

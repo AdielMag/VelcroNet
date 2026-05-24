@@ -10,7 +10,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Genbox.VelcroPhysics" Version="0.1.0-alpha.2" />
+    <PackageReference Include="Aether.Physics2D" Version="2.2.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Genbox.VelcroPhysics.Dynamics;
+using nkast.Aether.Physics2D.Dynamics;
 using VelcroNet;
 using SNV2 = System.Numerics.Vector2;
 

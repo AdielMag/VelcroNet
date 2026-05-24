@@ -1,6 +1,4 @@
-using Genbox.VelcroPhysics.Collision.Filtering;
-using Genbox.VelcroPhysics.Dynamics;
-using Genbox.VelcroPhysics.Factories;
+using nkast.Aether.Physics2D.Dynamics;
 using UnityEngine;
 using VelcroNet.Collision;
 
@@ -26,8 +24,7 @@ namespace VelcroNet
             var simSize   = MathBridge.ToNumerics(_size)   / SimulationConstants.PixelsPerMeter;
             var simOffset = MathBridge.ToNumerics(_offset) / SimulationConstants.PixelsPerMeter;
 
-            Fixture fixture = FixtureFactory.AttachRectangle(
-                body, simSize.X, simSize.Y, density, simOffset);
+            Fixture fixture = body.CreateRectangle(simSize.X, simSize.Y, density, AetherInterop.ToAether(simOffset));
 
             fixture.Friction    = friction;
             fixture.Restitution = restitution;

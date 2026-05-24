@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Genbox.VelcroPhysics.Dynamics;
-using Genbox.VelcroPhysics.Factories;
+
+
 using System.Numerics;
 using VelcroNet;
 using VelcroNet.Collision;
@@ -34,13 +34,13 @@ public sealed class CollisionEventTests
         var defA = BodyDef.Static;
         defA.Position = new Vector2(0f, 0f);
         var bodyA = world.CreateBody(in defA, 0);
-        var fixtureA = FixtureFactory.AttachRectangle(bodyA, 2f, 0.1f, 0f);
+        var fixtureA = bodyA.CreateRectangle(2f, 0.1f, 0f, nkast.Aether.Physics2D.Common.Vector2.Zero);
         world.SubscribeFixtureEvents(fixtureA);
 
         // Body 1: dynamic body falling onto the platform
         var defB = new BodyDef { BodyType = BodyType.Dynamic, Position = new Vector2(0f, 0.2f) };
         var bodyB = world.CreateBody(in defB, 1);
-        var fixtureB = FixtureFactory.AttachRectangle(bodyB, 0.2f, 0.2f, 1f);
+        var fixtureB = bodyB.CreateRectangle(0.2f, 0.2f, 1f, nkast.Aether.Physics2D.Common.Vector2.Zero);
         world.SubscribeFixtureEvents(fixtureB);
 
         // Drop body B down
