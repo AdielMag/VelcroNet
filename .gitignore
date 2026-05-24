@@ -26,7 +26,6 @@ packages/
 sysinfo.txt
 MemoryCaptures/
 [Aa]ssets/[Aa]sset[Ss]tore*/
-*.csproj
 *.unityproj
 *.sln.meta
 ExportedObj/
@@ -35,6 +34,9 @@ ExportedObj/
 *.unityproj.meta
 *.sln
 !VelcroNet.sln
+# Ignore Unity-generated csproj files (anywhere) but keep ours in src/ and tests/
+**/Assembly-CSharp*.csproj
+**/Unity.*.csproj
 *.tmp
 crashlytics-build.properties
 Assets/StreamingAssets/aa.meta
