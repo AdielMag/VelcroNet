@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <LangVersion>10</LangVersion>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -8,9 +8,32 @@
     <RootNamespace>AetherNet</RootNamespace>
     <AssemblyName>AetherNet.Shared</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- NuGet package metadata -->
+    <PackageId>AetherNet.Shared</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>AetherNet Contributors</Authors>
+    <Description>GC-free, deterministic 2D physics shared library for server-authoritative Unity multiplayer. Wraps Aether.Physics2D; runs identically on .NET 8 server and Unity client with zero GC allocation.</Description>
+    <PackageTags>physics;deterministic;multiplayer;unity;server-authoritative;gc-free;box2d;aether</PackageTags>
+    <PackageProjectUrl>https://github.com/AdielMag/VelcroNet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AdielMag/VelcroNet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Aether.Physics2D" Version="2.2.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
+    <!-- Source Link for debuggable NuGet symbols -->
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>
