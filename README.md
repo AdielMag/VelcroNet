@@ -15,7 +15,7 @@
 
 ## What is VelcroNet?
 
-VelcroNet completely decouples 2D physics simulation from Unity's native engine. A single, deterministic physics loop powered by [GenBox.VelcroPhysics](https://github.com/Genbox/VelcroPhysics) (a C# Box2D port) runs identically on a headless .NET 8 server and a Unity client — with zero runtime heap allocation.
+VelcroNet completely decouples 2D physics simulation from Unity's native engine. A single, deterministic physics loop powered by [Aether.Physics2D](https://github.com/nkast/Aether.Physics2D) (a pure C# Box2D port, actively maintained) runs identically on a headless .NET 8 server and a Unity client — with zero runtime heap allocation.
 
 Unity is used strictly as a visual layer. There are no `Rigidbody2D` components, no `Physics2D.Simulate` calls, and no GC pressure from the physics tick. This makes VelcroNet the right foundation for server-authoritative multiplayer games where client and server must agree on physics state down to the bit.
 
@@ -82,7 +82,7 @@ In Unity: **Window → Package Manager → + → Add package from git URL**, the
 https://github.com/adielmag/VelcroNet.git?path=unity/com.velcronet.unity#upm
 ```
 
-The `#upm` branch is published automatically by CI on every release and ships with the pre-built `VelcroNet.Shared.dll` and `Genbox.VelcroPhysics.dll` so the package works out of the box.
+The `#upm` branch is published automatically by CI on every release and ships with the pre-built `VelcroNet.Shared.dll` and `Aether.Physics2D.dll` so the package works out of the box.
 
 To pin a specific version, use the `upm/v*` tag (one is created per release):
 ```
