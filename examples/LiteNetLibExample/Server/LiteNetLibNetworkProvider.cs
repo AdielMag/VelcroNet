@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// REFERENCE EXAMPLE — not part of the core VelcroNet package
+// REFERENCE EXAMPLE — not part of the core AetherNet package
 //
 // Shows how to implement INetworkStateProvider with LiteNetLib.
 // Add package: dotnet add package LiteNetLib
@@ -10,10 +10,10 @@ using System.Net;
 using System.Net.Sockets;
 using LiteNetLib;
 using LiteNetLib.Utils;
-using VelcroNet;
-using VelcroNet.Network;
+using AetherNet;
+using AetherNet.Network;
 
-namespace VelcroNet.Examples.LiteNetLib
+namespace AetherNet.Examples.LiteNetLib
 {
     /// <summary>
     /// Broadcasts a full physics snapshot to all connected peers after each tick.
@@ -31,7 +31,7 @@ namespace VelcroNet.Examples.LiteNetLib
             _writer     = new NetDataWriter();
             _sendBuffer = new byte[SimulationConstants.MaxBodies * 40 + 32]; // rough upper bound
             _server.Start(port);
-            Console.WriteLine($"[VelcroNet Example] Listening on port {port}");
+            Console.WriteLine($"[AetherNet Example] Listening on port {port}");
         }
 
         public void PollEvents() => _server.PollEvents();
@@ -61,15 +61,15 @@ namespace VelcroNet.Examples.LiteNetLib
         // ─── INetEventListener ────────────────────────────────────────────────
 
         public void OnPeerConnected(NetPeer peer)
-            => Console.WriteLine($"[VelcroNet Example] Client connected: {peer.EndPoint}");
+            => Console.WriteLine($"[AetherNet Example] Client connected: {peer.EndPoint}");
 
         public void OnPeerDisconnected(NetPeer peer, DisconnectInfo info)
-            => Console.WriteLine($"[VelcroNet Example] Client disconnected: {peer.EndPoint} ({info.Reason})");
+            => Console.WriteLine($"[AetherNet Example] Client disconnected: {peer.EndPoint} ({info.Reason})");
 
         public void OnNetworkError(IPEndPoint endPoint, SocketError socketError) { }
         public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod method) { }
         public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType) { }
         public void OnNetworkLatencyUpdate(NetPeer peer, int latency) { }
-        public void OnConnectionRequest(ConnectionRequest request) => request.AcceptIfKey("velcronet");
+        public void OnConnectionRequest(ConnectionRequest request) => request.AcceptIfKey("aethernet");
     }
 }

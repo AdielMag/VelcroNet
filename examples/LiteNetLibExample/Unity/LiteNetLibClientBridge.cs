@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // REFERENCE EXAMPLE — Unity client-side bridge using LiteNetLib
-// Attach to a GameObject alongside VelcroViewManager.
+// Attach to a GameObject alongside AetherViewManager.
 // ─────────────────────────────────────────────────────────────────────────────
 
 using System;
@@ -9,10 +9,10 @@ using System.Net.Sockets;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using UnityEngine;
-using VelcroNet;
-using VelcroNet.Network;
+using AetherNet;
+using AetherNet.Network;
 
-namespace VelcroNet.Examples.LiteNetLib
+namespace AetherNet.Examples.LiteNetLib
 {
     public sealed class LiteNetLibClientBridge : MonoBehaviour, INetEventListener
     {
@@ -35,7 +35,7 @@ namespace VelcroNet.Examples.LiteNetLib
         private void Start()
         {
             _client.Start();
-            _client.Connect(_serverAddress, _serverPort, "velcronet");
+            _client.Connect(_serverAddress, _serverPort, "aethernet");
         }
 
         private void Update()
@@ -52,13 +52,13 @@ namespace VelcroNet.Examples.LiteNetLib
 
         private void ApplySnapshot(EntityState[] states, int count)
         {
-            var manager = VelcroViewManager.Instance;
+            var manager = AetherViewManager.Instance;
             if (manager == null) return;
 
             for (int i = 0; i < count; i++)
             {
                 // In a real implementation you'd update the visual transform via
-                // VelcroViewManager or network-managed ghost objects here.
+                // AetherViewManager or network-managed ghost objects here.
             }
         }
 
@@ -81,13 +81,13 @@ namespace VelcroNet.Examples.LiteNetLib
         public void OnPeerConnected(NetPeer peer)
         {
             _server = peer;
-            Debug.Log($"[VelcroNet Example] Connected to server: {peer.EndPoint}");
+            Debug.Log($"[AetherNet Example] Connected to server: {peer.EndPoint}");
         }
 
         public void OnPeerDisconnected(NetPeer peer, DisconnectInfo info)
         {
             _server = null;
-            Debug.Log("[VelcroNet Example] Disconnected from server.");
+            Debug.Log("[AetherNet Example] Disconnected from server.");
         }
 
         public void OnNetworkError(IPEndPoint endPoint, SocketError socketError) { }

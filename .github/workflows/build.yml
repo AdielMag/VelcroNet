@@ -20,10 +20,10 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore
-        run: dotnet restore VelcroNet.sln
+        run: dotnet restore AetherNet.sln
 
       - name: Build
-        run: dotnet build VelcroNet.sln --no-restore -c Release
+        run: dotnet build AetherNet.sln --no-restore -c Release
 
       - name: Test
-        run: dotnet test tests/VelcroNet.Tests/VelcroNet.Tests.csproj --no-build -c Release --logger "console;verbosity=normal"
+        run: dotnet test tests/AetherNet.Tests/AetherNet.Tests.csproj --no-build -c Release --logger "console;verbosity=normal"

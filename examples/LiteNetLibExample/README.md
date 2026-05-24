@@ -1,6 +1,6 @@
 # LiteNetLib Reference Example
 
-A complete, working implementation of VelcroNet networking using [LiteNetLib](https://github.com/RevenantX/LiteNetLib).
+A complete, working implementation of AetherNet networking using [LiteNetLib](https://github.com/RevenantX/LiteNetLib).
 
 ## Files
 

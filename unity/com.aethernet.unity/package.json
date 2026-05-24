@@ -1,0 +1,23 @@
+{
+  "name": "com.aethernet.unity",
+  "version": "0.1.0",
+  "displayName": "AetherNet",
+  "description": "GC-free, deterministic 2D physics for server-authoritative Unity multiplayer. Wraps Aether.Physics2D; runs identically on .NET 8 server and Unity client with zero GC allocation.",
+  "unity": "2021.3",
+  "unityRelease": "0f1",
+  "documentationUrl": "https://github.com/adielmag/aethernet",
+  "changelogUrl": "https://github.com/adielmag/aethernet/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/adielmag/aethernet/blob/main/LICENSE",
+  "dependencies": {},
+  "keywords": [
+    "physics",
+    "deterministic",
+    "multiplayer",
+    "server-authoritative",
+    "gc-free"
+  ],
+  "author": {
+    "name": "AetherNet Contributors",
+    "url": "https://github.com/adielmag/aethernet"
+  }
+}

@@ -24,16 +24,16 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore
-        run: dotnet restore src/VelcroNet.Shared/VelcroNet.Shared.csproj
+        run: dotnet restore src/AetherNet.Shared/AetherNet.Shared.csproj
 
-      - name: Build VelcroNet.Shared
-        run: dotnet build src/VelcroNet.Shared/VelcroNet.Shared.csproj -c Release -o build-output
+      - name: Build AetherNet.Shared
+        run: dotnet build src/AetherNet.Shared/AetherNet.Shared.csproj -c Release -o build-output
 
       - name: Copy DLLs into Plugins
         run: |
-          mkdir -p unity/com.velcronet.unity/Runtime/Plugins
-          cp build-output/VelcroNet.Shared.dll       unity/com.velcronet.unity/Runtime/Plugins/
-          cp build-output/Aether.Physics2D.dll       unity/com.velcronet.unity/Runtime/Plugins/
+          mkdir -p unity/com.aethernet.unity/Runtime/Plugins
+          cp build-output/AetherNet.Shared.dll       unity/com.aethernet.unity/Runtime/Plugins/
+          cp build-output/Aether.Physics2D.dll       unity/com.aethernet.unity/Runtime/Plugins/
 
       - name: Configure git
         run: |
@@ -45,8 +45,8 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           # Force-include the Plugins DLLs (they're gitignored on main)
-          git add -f unity/com.velcronet.unity/Runtime/Plugins/VelcroNet.Shared.dll
-          git add -f unity/com.velcronet.unity/Runtime/Plugins/Aether.Physics2D.dll
+          git add -f unity/com.aethernet.unity/Runtime/Plugins/AetherNet.Shared.dll
+          git add -f unity/com.aethernet.unity/Runtime/Plugins/Aether.Physics2D.dll
 
           git commit -m "Build UPM package for $TAG"
 

@@ -1,23 +1,23 @@
 <div align="center">
-  <h1>⚡ VelcroNet</h1>
+  <h1>⚡ AetherNet</h1>
   <p><strong>GC-free, deterministic 2D physics for server-authoritative Unity games</strong></p>
 
   <p>
-    <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/adielmag/velcronet/build.yml?style=flat-square&logo=github">
-    <img alt="License" src="https://img.shields.io/github/license/adielmag/velcronet?style=flat-square">
+    <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/adielmag/aethernet/build.yml?style=flat-square&logo=github">
+    <img alt="License" src="https://img.shields.io/github/license/adielmag/aethernet?style=flat-square">
     <img alt="Unity" src="https://img.shields.io/badge/Unity-2021.3%2B-black?style=flat-square&logo=unity">
     <img alt=".NET" src="https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet">
-    <img alt="Release" src="https://img.shields.io/github/v/release/adielmag/velcronet?style=flat-square&logo=github&label=release">
+    <img alt="Release" src="https://img.shields.io/github/v/release/adielmag/aethernet?style=flat-square&logo=github&label=release">
   </p>
 </div>
 
 ---
 
-## What is VelcroNet?
+## What is AetherNet?
 
-VelcroNet completely decouples 2D physics simulation from Unity's native engine. A single, deterministic physics loop powered by [Aether.Physics2D](https://github.com/nkast/Aether.Physics2D) (a pure C# Box2D port, actively maintained) runs identically on a headless .NET 8 server and a Unity client — with zero runtime heap allocation.
+AetherNet completely decouples 2D physics simulation from Unity's native engine. A single, deterministic physics loop powered by [Aether.Physics2D](https://github.com/nkast/Aether.Physics2D) (a pure C# Box2D port, actively maintained) runs identically on a headless .NET 8 server and a Unity client — with zero runtime heap allocation.
 
-Unity is used strictly as a visual layer. There are no `Rigidbody2D` components, no `Physics2D.Simulate` calls, and no GC pressure from the physics tick. This makes VelcroNet the right foundation for server-authoritative multiplayer games where client and server must agree on physics state down to the bit.
+Unity is used strictly as a visual layer. There are no `Rigidbody2D` components, no `Physics2D.Simulate` calls, and no GC pressure from the physics tick. This makes AetherNet the right foundation for server-authoritative multiplayer games where client and server must agree on physics state down to the bit.
 
 ---
 
@@ -46,7 +46,7 @@ graph TD
         ML[MapLoader] -->|CreateBody| PM
     end
 
-    subgraph Shared ["VelcroNet.Shared (.NET Standard 2.0)"]
+    subgraph Shared ["AetherNet.Shared (.NET Standard 2.0)"]
         PM[PhysicsWorldManager]
         CE[CollisionEventQueue]
         CT[ContactTracker]
@@ -55,12 +55,12 @@ graph TD
         PM --> CT
     end
 
-    subgraph Unity ["com.velcronet.unity (Unity Package)"]
-        VM[VelcroViewManager\nFixedUpdate · LateUpdate] -->|Advance| PM
+    subgraph Unity ["com.aethernet.unity (Unity Package)"]
+        VM[AetherViewManager\nFixedUpdate · LateUpdate] -->|Advance| PM
         VM -->|DrainAll| CE
-        RB[VelcroRigidbody\nAddForce · velocity]
-        COL[Velcro*Collider\nIVelcroColliderProvider]
-        HANDLER[IVelcroCollisionHandler\nIVelcroTriggerHandler\nGame Scripts]
+        RB[AetherRigidbody\nAddForce · velocity]
+        COL[Aether*Collider\nIAetherColliderProvider]
+        HANDLER[IAetherCollisionHandler\nIAetherTriggerHandler\nGame Scripts]
         VM --> RB
         VM -->|dispatch| HANDLER
         COL -->|AttachToBody| PM
@@ -79,34 +79,34 @@ graph TD
 
 In Unity: **Window → Package Manager → + → Add package from git URL**, then paste:
 ```
-https://github.com/adielmag/VelcroNet.git?path=unity/com.velcronet.unity#upm
+https://github.com/adielmag/AetherNet.git?path=unity/com.aethernet.unity#upm
 ```
 
-The `#upm` branch is published automatically by CI on every release and ships with the pre-built `VelcroNet.Shared.dll` and `Aether.Physics2D.dll` so the package works out of the box.
+The `#upm` branch is published automatically by CI on every release and ships with the pre-built `AetherNet.Shared.dll` and `Aether.Physics2D.dll` so the package works out of the box.
 
 To pin a specific version, use the `upm/v*` tag (one is created per release):
 ```
-https://github.com/adielmag/VelcroNet.git?path=unity/com.velcronet.unity#upm/v0.1.0
+https://github.com/adielmag/AetherNet.git?path=unity/com.aethernet.unity#upm/v0.1.0
 ```
 
-**Manual** — download a release tarball from [Releases](https://github.com/adielmag/velcronet/releases) and extract `unity/com.velcronet.unity` into your project's `Packages/` folder.
+**Manual** — download a release tarball from [Releases](https://github.com/adielmag/aethernet/releases) and extract `unity/com.aethernet.unity` into your project's `Packages/` folder.
 
 ### 2. Scene Setup
 
-1. Create an empty GameObject, add **VelcroNet → View Manager**.
-2. On your entity prefabs, add **VelcroNet → Rigidbody** and one of **VelcroNet → Box / Circle / Polygon Collider**.
-3. Bake the scene: **VelcroNet → Bake Scene to JSON** (saves a `MapData.json` for the server).
+1. Create an empty GameObject, add **AetherNet → View Manager**.
+2. On your entity prefabs, add **AetherNet → Rigidbody** and one of **AetherNet → Box / Circle / Polygon Collider**.
+3. Bake the scene: **AetherNet → Bake Scene to JSON** (saves a `MapData.json` for the server).
 
 ### 3. Force and Physics
 
 ```csharp
-using VelcroNet;
+using AetherNet;
 
-public class PlayerController : MonoBehaviour, IVelcroCollisionHandler, IVelcroTriggerHandler
+public class PlayerController : MonoBehaviour, IAetherCollisionHandler, IAetherTriggerHandler
 {
-    private VelcroRigidbody _rb;
+    private AetherRigidbody _rb;
 
-    void Awake() => _rb = GetComponent<VelcroRigidbody>();
+    void Awake() => _rb = GetComponent<AetherRigidbody>();
 
     void Update()
     {
@@ -130,11 +130,11 @@ public class PlayerController : MonoBehaviour, IVelcroCollisionHandler, IVelcroT
 ### 4. Physics Queries
 
 ```csharp
-using VelcroNet;
-using VelcroNet.Queries;
+using AetherNet;
+using AetherNet.Queries;
 
 var results = new RaycastHit[8];
-int count = VelcroPhysicsQueries.Raycast(
+int count = AetherPhysicsQueries.Raycast(
     origin:    transform.position,
     direction: Vector2.right,
     distance:  10f,
@@ -149,7 +149,7 @@ for (int i = 0; i < count; i++)
 ## Quick Start — Headless Server
 
 ```bash
-cd src/VelcroNet.Server
+cd src/AetherNet.Server
 dotnet run -- maps/level01.json
 ```
 
@@ -175,7 +175,7 @@ loop.Run(CancellationToken.None);
 
 ## Networking
 
-VelcroNet provides **contracts and utilities**, not a bundled transport:
+AetherNet provides **contracts and utilities**, not a bundled transport:
 
 | Type | Purpose |
 |---|---|
@@ -192,13 +192,13 @@ See **[`examples/LiteNetLibExample/`](examples/LiteNetLibExample/)** for a compl
 
 ## Performance Guidelines
 
-VelcroNet enforces these rules internally. Follow them in your own game code too:
+AetherNet enforces these rules internally. Follow them in your own game code too:
 
 - **No LINQ in hot paths.** Use raw `for` loops in Update, FixedUpdate, physics callbacks.
 - **No `GetComponent` at runtime.** Cache all component references in `Awake`.
-- **Never feed `Time.deltaTime` to physics.** `VelcroViewManager` pins `Time.fixedDeltaTime` to `SimulationConstants.FixedTimestep` and uses the accumulator exclusively.
+- **Never feed `Time.deltaTime` to physics.** `AetherViewManager` pins `Time.fixedDeltaTime` to `SimulationConstants.FixedTimestep` and uses the accumulator exclusively.
 - **Pass large structs by `in` or `ref`.** CollisionData, TriggerData, BodyDef — never copy by value in hot code.
-- **One `SetPositionAndRotation` call per body per frame.** `VelcroViewManager` batches all transform writes in a single `LateUpdate` loop.
+- **One `SetPositionAndRotation` call per body per frame.** `AetherViewManager` batches all transform writes in a single `LateUpdate` loop.
 - **Pre-allocate result buffers.** `PhysicsQueryBuffer` and `NetworkObjectPool` are created once and reused indefinitely.
 
 ---
@@ -206,9 +206,9 @@ VelcroNet enforces these rules internally. Follow them in your own game code too
 ## Contributing
 
 1. Fork the repo and create a branch: `feature/your-feature` or `fix/issue-description`.
-2. All changes to `VelcroNet.Shared` must pass `dotnet test`.
+2. All changes to `AetherNet.Shared` must pass `dotnet test`.
 3. PR checklist:
-   - [ ] `dotnet build VelcroNet.sln` with no errors or warnings
+   - [ ] `dotnet build AetherNet.sln` with no errors or warnings
    - [ ] `dotnet test` — all tests green, determinism tests pass
    - [ ] No new GC.Alloc in hot paths (Unity Profiler / BenchmarkDotNet)
    - [ ] New public API documented with XML summary comments

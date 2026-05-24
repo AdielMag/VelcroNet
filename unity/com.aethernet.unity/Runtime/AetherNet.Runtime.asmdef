@@ -1,0 +1,17 @@
+{
+    "name": "AetherNet.Runtime",
+    "rootNamespace": "AetherNet",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "AetherNet.Shared.dll",
+        "Aether.Physics2D.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

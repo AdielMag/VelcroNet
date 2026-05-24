@@ -1,41 +1,35 @@
-# API Verification Notes
+# AetherNet — Developer Notes
 
-When integrating with the actual Genbox.VelcroPhysics NuGet package, verify these
-call sites in case the library version you install has a slightly different signature.
+## Physics Backend
 
-## 1. `World.Step` signature
-Expected: `void Step(float timeStep, int velocityIterations = 8, int positionIterations = 3)`
-Used in: `PhysicsWorldManager.Advance()`
+AetherNet uses [Aether.Physics2D 2.2.0](https://github.com/nkast/Aether.Physics2D) as its physics backend.
 
-## 2. `World.Remove(Body)` vs `World.DestroyBody(Body)`
-Expected: `void Remove(Body body)`
-Used in: `PhysicsWorldManager.DestroyBody()`
+- **Package**: `nkast.Aether.Physics2D` on NuGet
+- **Namespace prefix**: `nkast.Aether.Physics2D.*`
+- **API style**: Box2D 2.x (Farseer lineage)
+- **Pure C#, no native deps** — works on Unity IL2CPP (iOS, Android, WebGL)
+- **Targets**: netstandard2.0 + net8.0
 
-## 3. `Fixture.CollisionCategories` / `CollidesWith` type
-Expected: `Category` enum from `Genbox.VelcroPhysics.Collision.Filtering`
-Used in: `VelcroBoxCollider`, `VelcroCircleCollider`, `VelcroPolygonCollider`, `MapLoader`
-If compilation fails, update the `using` alias or cast target.
+## Vector2 Boundary
 
-## 4. `Contact.GetWorldManifold` + `FixedArray2<Vector2>` indexer
-Expected: `void GetWorldManifold(out Vector2 normal, out FixedArray2<Vector2> points)`
-and `points[0]` or `points.Value0` for the first contact point.
-Used in: `PhysicsWorldManager.HandleCollision()`
-If `FixedArray2<T>` has no indexer, replace `points[0]` with `points.Value0`.
+The public API (`EntityState`, `TransformState`, `BodyDef`, force methods, query results) uses `System.Numerics.Vector2`.
 
-## 5. `OnSeparationEventHandler` signature
-Expected: `delegate void OnSeparationEventHandler(Fixture sender, Fixture other, Contact contact)`
-Used in: `PhysicsWorldManager._onSeparationHandler`
-If the Contact parameter is absent, change the handler signature to `(Fixture, Fixture)`.
+The physics backend uses `nkast.Aether.Physics2D.Common.Vector2`.
 
-## 6. `FixtureFactory.AttachRectangle` parameter order
-Expected: `(Body body, float width, float height, float density, Vector2 offset = default)`
-If the library uses a different order (e.g., body last), update all factory call sites.
+`AetherInterop.ToAether(SNV2)` / `AetherInterop.FromAether(AVec2)` convert at the boundary (inlined, zero overhead).
 
-## 7. `Vertices` class location
-Expected: `Genbox.VelcroPhysics.Shared.Vertices` extending `List<Vector2>`
-Used in: `VelcroPolygonCollider.Awake()`, `MapLoader.AttachPolygon()`
+## Key API Mapping
 
-## 8. `Body.Rotation` vs `Body.Angle`
-Expected: `float Rotation` (radians)
-Used throughout as the body's current angle.
-If the property is named `Angle`, update all references.
+| Task | Aether.Physics2D |
+|---|---|
+| Create body | `World.CreateBody(pos, angle, BodyType)` |
+| Step | `World.Step(float dt)` |
+| Remove body | `World.Remove(Body)` |
+| Attach box | `Body.CreateRectangle(w, h, density, offset)` |
+| Attach circle | `Body.CreateCircle(r, density, offset)` |
+| Attach polygon | `Body.CreatePolygon(Vertices, density)` |
+| User data | `Body.Tag` (object) |
+| Awake state | `Body.Awake` (bool) |
+| Collision delegate | `OnCollisionEventHandler` |
+| Separation delegate | `OnSeparationEventHandler` |
+| Raycast delegate | `RayCastReportFixtureDelegate` |
