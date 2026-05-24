@@ -11,7 +11,6 @@ namespace AetherNet
         [SerializeField] private Vector2               _offset    = Vector2.zero;
         [SerializeField] private bool                  _isTrigger;
         [SerializeField] private int                   _layer;
-        [SerializeField] [Range(0, 0xFFFF)] private int _collisionMask = 0xFFFF;
         [SerializeField] private AetherPhysicsMaterial _material;
 
         void IAetherColliderProvider.AttachToBody(Body body, PhysicsWorldManager world)
@@ -29,7 +28,7 @@ namespace AetherNet
             fixture.Restitution = restitution;
             fixture.IsSensor    = _isTrigger;
 
-            var filter = CollisionFilter.FromLayer(_layer, _collisionMask);
+            var filter = CollisionFilter.FromLayer(_layer);
             fixture.CollisionCategories = (Category)filter.CategoryBits;
             fixture.CollidesWith        = (Category)filter.MaskBits;
             fixture.CollisionGroup      = filter.GroupIndex;

@@ -22,7 +22,6 @@ public class BakedFixtureDef
     public float             Restitution    { get; set; }
     public bool              IsSensor       { get; set; }
     public int               Layer          { get; set; }
-    public int               CollisionMask  { get; set; } = 0xFFFF;
 }
 
 public class BakedEntityDef

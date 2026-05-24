@@ -71,7 +71,7 @@ public sealed class MapLoader
         fixture.Restitution = data.Restitution;
         fixture.IsSensor    = data.IsSensor;
 
-        ApplyFilter(fixture, data.Layer, data.CollisionMask);
+        ApplyFilter(fixture, data.Layer);
         world.SubscribeFixtureEvents(fixture);
     }
 
@@ -85,9 +85,9 @@ public sealed class MapLoader
         return body.CreatePolygon(_scratchVertices, data.Density);
     }
 
-    private static void ApplyFilter(Fixture fixture, int layer, int mask)
+    private static void ApplyFilter(Fixture fixture, int layer)
     {
-        var filter = CollisionFilter.FromLayer(layer, mask);
+        var filter = CollisionFilter.FromLayer(layer);
         fixture.CollisionCategories = (Category)filter.CategoryBits;
         fixture.CollidesWith        = (Category)filter.MaskBits;
         fixture.CollisionGroup      = filter.GroupIndex;

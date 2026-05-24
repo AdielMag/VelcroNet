@@ -20,11 +20,16 @@ public struct CollisionFilter
         GroupIndex   = 0,
     };
 
-    public static CollisionFilter FromLayer(int layer, int collisionMask = 0xFFFF)
+    /// <summary>
+    /// Build a filter for <paramref name="layer"/> using the shared
+    /// <see cref="PhysicsLayers"/> collision matrix. Pass an explicit
+    /// <paramref name="overrideMask"/> only when you need a per-fixture exception.
+    /// </summary>
+    public static CollisionFilter FromLayer(int layer, int overrideMask = -1)
         => new CollisionFilter
         {
             CategoryBits = (ushort)(1 << layer),
-            MaskBits     = (ushort)collisionMask,
+            MaskBits     = (ushort)(overrideMask >= 0 ? overrideMask : PhysicsLayers.MaskFor(layer)),
             GroupIndex   = 0,
         };
 }
