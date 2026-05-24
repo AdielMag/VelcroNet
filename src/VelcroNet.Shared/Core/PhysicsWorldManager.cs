@@ -46,7 +46,7 @@ public sealed class PhysicsWorldManager
 
     // --- Query system ---
     private readonly PhysicsQueryBuffer _queryBuffer;
-    private readonly Func<Fixture, AVec2, AVec2, float, float> _rayCastCallback;
+    private readonly RayCastReportFixtureDelegate _rayCastCallback;
     private PhysicsQueryBuffer? _activeQueryBuffer; // set during Raycast call
 
     // --- Optional network provider ---
