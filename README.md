@@ -7,7 +7,7 @@
     <img alt="License" src="https://img.shields.io/github/license/adielmag/velcronet?style=flat-square">
     <img alt="Unity" src="https://img.shields.io/badge/Unity-2021.3%2B-black?style=flat-square&logo=unity">
     <img alt=".NET" src="https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet">
-    <img alt="UPM" src="https://img.shields.io/badge/upm-0.1.0-blue?style=flat-square&logo=unity">
+    <img alt="Release" src="https://img.shields.io/github/v/release/adielmag/velcronet?style=flat-square&logo=github&label=release">
   </p>
 </div>
 
@@ -75,11 +75,16 @@ graph TD
 
 ### 1. Install
 
-**Via Unity Package Manager (Git URL)**
+**Via Unity Package Manager (recommended)**
 
 In Unity: **Window → Package Manager → + → Add package from git URL**, then paste:
 ```
 https://github.com/adielmag/VelcroNet.git?path=unity/com.velcronet.unity
+```
+
+To pin a specific version, append `#v0.1.0` (or any tag from [Releases](https://github.com/adielmag/VelcroNet/releases)):
+```
+https://github.com/adielmag/VelcroNet.git?path=unity/com.velcronet.unity#v0.1.0
 ```
 
 **Manual** — copy `unity/com.velcronet.unity` into your project's `Packages/` folder. Place the pre-built `VelcroNet.Shared.dll` and `Genbox.VelcroPhysics.dll` in `Runtime/Plugins/`.
