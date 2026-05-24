@@ -3,11 +3,10 @@
   <p><strong>GC-free, deterministic 2D physics for server-authoritative Unity games</strong></p>
 
   <p>
-    <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/adielmag/velcronet/build.yml?branch=main&style=flat-square&logo=github">
-    <img alt="License" src="https://img.shields.io/github/license/adielmag/velcronet?style=flat-square">
+    <img alt="License" src="https://img.shields.io/badge/license-MIT-yellow?style=flat-square">
     <img alt="Unity" src="https://img.shields.io/badge/Unity-2021.3%2B-black?style=flat-square&logo=unity">
     <img alt=".NET" src="https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet">
-    <img alt="OpenUPM" src="https://img.shields.io/npm/v/com.velcronet.unity?label=openupm&registry_uri=https%3A%2F%2Fpackage.openupm.com&style=flat-square">
+    <img alt="Status" src="https://img.shields.io/badge/status-alpha-orange?style=flat-square">
   </p>
 </div>
 
@@ -75,9 +74,11 @@ graph TD
 
 ### 1. Install
 
-**Via OpenUPM (recommended)**
-```bash
-openupm add com.velcronet.unity
+**Via Unity Package Manager (Git URL)**
+
+In Unity: **Window → Package Manager → + → Add package from git URL**, then paste:
+```
+https://github.com/adielmag/VelcroNet.git?path=unity/com.velcronet.unity
 ```
 
 **Manual** — copy `unity/com.velcronet.unity` into your project's `Packages/` folder. Place the pre-built `VelcroNet.Shared.dll` and `Genbox.VelcroPhysics.dll` in `Runtime/Plugins/`.
