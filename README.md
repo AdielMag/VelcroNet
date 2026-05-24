@@ -79,15 +79,17 @@ graph TD
 
 In Unity: **Window → Package Manager → + → Add package from git URL**, then paste:
 ```
-https://github.com/adielmag/VelcroNet.git?path=unity/com.velcronet.unity
+https://github.com/adielmag/VelcroNet.git?path=unity/com.velcronet.unity#upm
 ```
 
-To pin a specific version, append `#v0.1.0` (or any tag from [Releases](https://github.com/adielmag/VelcroNet/releases)):
+The `#upm` branch is published automatically by CI on every release and ships with the pre-built `VelcroNet.Shared.dll` and `Genbox.VelcroPhysics.dll` so the package works out of the box.
+
+To pin a specific version, use the `upm/v*` tag (one is created per release):
 ```
-https://github.com/adielmag/VelcroNet.git?path=unity/com.velcronet.unity#v0.1.0
+https://github.com/adielmag/VelcroNet.git?path=unity/com.velcronet.unity#upm/v0.1.0
 ```
 
-**Manual** — copy `unity/com.velcronet.unity` into your project's `Packages/` folder. Place the pre-built `VelcroNet.Shared.dll` and `Genbox.VelcroPhysics.dll` in `Runtime/Plugins/`.
+**Manual** — download a release tarball from [Releases](https://github.com/adielmag/velcronet/releases) and extract `unity/com.velcronet.unity` into your project's `Packages/` folder.
 
 ### 2. Scene Setup
 

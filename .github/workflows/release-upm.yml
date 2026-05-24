@@ -1,0 +1,58 @@
+name: Publish UPM Package
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  publish-upm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore src/VelcroNet.Shared/VelcroNet.Shared.csproj
+
+      - name: Build VelcroNet.Shared
+        run: dotnet build src/VelcroNet.Shared/VelcroNet.Shared.csproj -c Release -o build-output
+
+      - name: Copy DLLs into Plugins
+        run: |
+          mkdir -p unity/com.velcronet.unity/Runtime/Plugins
+          cp build-output/VelcroNet.Shared.dll        unity/com.velcronet.unity/Runtime/Plugins/
+          cp build-output/Genbox.VelcroPhysics.dll    unity/com.velcronet.unity/Runtime/Plugins/
+
+      - name: Configure git
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Push to upm branch
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          # Force-include the Plugins DLLs (they're gitignored on main)
+          git add -f unity/com.velcronet.unity/Runtime/Plugins/VelcroNet.Shared.dll
+          git add -f unity/com.velcronet.unity/Runtime/Plugins/Genbox.VelcroPhysics.dll
+
+          git commit -m "Build UPM package for $TAG"
+
+          # Push the commit to the upm branch (force — upm always mirrors latest tag)
+          git push origin "HEAD:refs/heads/upm" --force
+
+          # Mirror a versioned tag onto the upm branch so users can pin
+          git tag -f "upm/$TAG"
+          git push origin "upm/$TAG" --force
