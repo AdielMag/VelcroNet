@@ -3,10 +3,11 @@
   <p><strong>GC-free, deterministic 2D physics for server-authoritative Unity games</strong></p>
 
   <p>
-    <img alt="License" src="https://img.shields.io/badge/license-MIT-yellow?style=flat-square">
+    <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/adielmag/velcronet/build.yml?style=flat-square&logo=github">
+    <img alt="License" src="https://img.shields.io/github/license/adielmag/velcronet?style=flat-square">
     <img alt="Unity" src="https://img.shields.io/badge/Unity-2021.3%2B-black?style=flat-square&logo=unity">
     <img alt=".NET" src="https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet">
-    <img alt="Status" src="https://img.shields.io/badge/status-alpha-orange?style=flat-square">
+    <img alt="UPM" src="https://img.shields.io/badge/upm-0.1.0-blue?style=flat-square&logo=unity">
   </p>
 </div>
 

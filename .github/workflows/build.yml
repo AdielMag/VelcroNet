@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: Build & Test (.NET)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore VelcroNet.sln
+
+      - name: Build
+        run: dotnet build VelcroNet.sln --no-restore -c Release
+
+      - name: Test
+        run: dotnet test tests/VelcroNet.Tests/VelcroNet.Tests.csproj --no-build -c Release --logger "console;verbosity=normal"
