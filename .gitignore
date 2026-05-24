@@ -1,0 +1,60 @@
+# Build artifacts
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+
+# Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+MemoryCaptures/
+[Aa]ssets/[Aa]sset[Ss]tore*/
+*.csproj
+*.unityproj
+*.sln.meta
+ExportedObj/
+.consulo/
+*.csproj.meta
+*.unityproj.meta
+*.sln
+!VelcroNet.sln
+*.tmp
+crashlytics-build.properties
+Assets/StreamingAssets/aa.meta
+Assets/StreamingAssets/aa/
+# Unity package manager cache
+[Pp]ackages/[Cc]ache/
+
+# macOS
+.DS_Store
+*.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Compiled DLLs in Unity Plugins (populated by build script)
+unity/com.velcronet.unity/Runtime/Plugins/*.dll
+unity/com.velcronet.unity/Runtime/Plugins/*.pdb
+!unity/com.velcronet.unity/Runtime/Plugins/.gitkeep

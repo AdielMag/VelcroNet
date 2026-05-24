@@ -1,0 +1,17 @@
+{
+    "name": "VelcroNet.Runtime",
+    "rootNamespace": "VelcroNet",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "VelcroNet.Shared.dll",
+        "Genbox.VelcroPhysics.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
